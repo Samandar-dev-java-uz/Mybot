@@ -4,12 +4,15 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static uz.pdp.model.User.*;
+
 
 public  class Mybot extends TelegramLongPollingBot {
 
@@ -17,97 +20,38 @@ public  class Mybot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         Message message = update.getMessage();
         Long chatId = message.getChatId();
-
-        System.out.println(chatId);
-
+        String text = message.getText();
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
-
-        if (!message.hasText()) return;
-        String text = message.getText();
-        if (text != null && !text.isEmpty()) {
-            UserInformation userInformation = listUser.getOrDefault(chatId,
-                    UserInformation.builder()
-                            .chadId(chatId)
-                            .state(START)
-                            .build());
-
-            String state = userInformation.getState();
-
-            switch (state) {
-                case User.START:
-                    if (text.equals("/start")) {
-                        sendMessage.setText("Enter your first name:");
-                        userInformation.setState(ENTER_FIRSTNAME);
-                        listUser.put(chatId, userInformation);
-                    }
-                    break;
-
-                case User.ENTER_FIRSTNAME:
-                    userInformation.setName(text);
-                    listUser.put(chatId, userInformation);
-                    sendMessage.setText("Enter your last name:");
-                    userInformation.setState(ENTER_LASTNAME);
-                    listUser.put(chatId, userInformation);
-                    break;
-
-                case User.ENTER_LASTNAME:
-                    userInformation.setLastname(text);
-                    sendMessage.setText("Enter age" );
-                    userInformation.setState(ENTER_AGE);
-                    listUser.put(chatId, userInformation);
-                    break;
-                case ENTER_AGE:
-                    try{
-                        int age = Integer.parseInt(text);
-                        userInformation.setAge(age);
-                        sendMessage.setText("Enter your phone ");
-                        userInformation.setState(ENTER_PHONE_NUMBER);
-                        listUser.put(chatId,userInformation);
-                    } catch (NumberFormatException e) {
-                        throw new RuntimeException(e);
-                    }
-
-                    break;
-                case ENTER_PHONE_NUMBER:
-                    userInformation.setPhoneNumber(text);
-                    sendMessage.setText("Enter password ");
-                    userInformation.setState(ENTER_PASSWORD);
-                    listUser.put(chatId,userInformation);
-                    break;
-
-                case ENTER_PASSWORD:
-                    userInformation.setPassword(text);
-                    sendMessage.setText(" you successful register ");
-                    userInformation.setState(START);
-                    sendMessage.setText(
-                            "your name -> "+userInformation.getName() +"\n"+
-                                    "your lastname -> "+ userInformation.getLastname() +"\n"+
-                                    "your age ->"+ userInformation.getAge()+"\n"+
-                                    "your phone number ->" + userInformation.getPhoneNumber()+"\n"+
-                                    "your password ->"+ userInformation.getPassword() );
-                    listUser.put(chatId,userInformation);
-                    break;
-
-            }
-
-            try {
-                execute(sendMessage);
-            } catch (TelegramApiException e) {
-                e.printStackTrace();
-            }
-
-        } else {
-            sendMessage.setText("Xatolik: matn topilmadi.");
-            try {
-                execute(sendMessage);
-            } catch (TelegramApiException e) {
-                throw new RuntimeException(e);
-            }
-
+        sendMessage.setText(" tugmachani bosing ");
+        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+        List<KeyboardRow>rowList = new ArrayList<>();
+        KeyboardRow row1 = new KeyboardRow();
+        KeyboardRow row2 = new KeyboardRow();
+        KeyboardButton button1 = new KeyboardButton();
+        KeyboardButton button2 = new KeyboardButton();
+        KeyboardButton button3= new KeyboardButton();
+        KeyboardButton button4= new KeyboardButton();
+        KeyboardButton button5= new KeyboardButton();
+        button1.setText(" qalaysan");
+        button2.setText(" yaxshimisan");
+        button3.setText(" men yaxshi");
+        button4.setText(" yaxshi");
+        button5.setText(" good");
+        row1.add(button1);
+        row1.add(button2);
+        row1.add(button3);
+        row2.add(button4);
+        row2.add(button5);
+        rowList.add(row1);
+        rowList.add(row2);
+        replyKeyboardMarkup.setKeyboard(rowList);
+        sendMessage.setReplyMarkup(replyKeyboardMarkup);
+        try {
+            execute(sendMessage);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
         }
-
-
 
     }
 
